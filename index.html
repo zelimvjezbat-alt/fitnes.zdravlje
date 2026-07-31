@@ -4,80 +4,305 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trener - Generator treninga</title>
+
+  <!-- html2pdf biblioteka za preuzimanje PDF-a -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
   <style>
+    :root {
+      --bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text: #222;
+      --text-muted: #555;
+      --primary: #1a73e8;
+      --primary-hover: #1557b0;
+      --border: #ccc;
+      --border-light: #d0d7de;
+      --share-bg: #e8f0fe;
+      --sets-btn-bg: #e8f0fe;
+      --sets-btn-text: #1a73e8;
+      --sets-btn-border: #c5d7f7;
+      --delete: #e74c3c;
+      --delete-hover: #c0392b;
+      --add: #34a853;
+      --add-hover: #2d8e47;
+      --section-border: #e8f0fe;
+      --shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    body.dark {
+      --bg: #121212;
+      --card-bg: #1e1e1e;
+      --text: #e8e8e8;
+      --text-muted: #aaa;
+      --primary: #4a9eff;
+      --primary-hover: #3a8aef;
+      --border: #444;
+      --border-light: #333;
+      --share-bg: #1a2a3a;
+      --sets-btn-bg: #2a3a4a;
+      --sets-btn-text: #7bb3ff;
+      --sets-btn-border: #3a4a5a;
+      --delete: #e74c3c;
+      --delete-hover: #c0392b;
+      --add: #2ea043;
+      --add-hover: #238636;
+      --section-border: #2a3a4a;
+      --shadow: 0 2px 10px rgba(0,0,0,0.4);
+    }
+
     body {
       font-family: 'Segoe UI', sans-serif;
       max-width: 900px;
       margin: 0 auto;
       padding: 20px;
-      background: #f8f9fa;
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.25s, color 0.25s;
     }
-    h1, h2 { color: #1a73e8; }
+
+    h1, h2 { color: var(--primary); }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .theme-toggle {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .theme-toggle:hover {
+      border-color: var(--primary);
+    }
+
     .form-group { margin-bottom: 15px; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
     input, textarea, select {
       width: 100%;
       padding: 10px;
-      border: 1px solid #ccc;
+      border: 1px solid var(--border);
       border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 15px;
+      background: var(--card-bg);
+      color: var(--text);
     }
+    input::placeholder, textarea::placeholder {
+      color: var(--text-muted);
+    }
+
     button {
       padding: 12px 20px;
-      background: #1a73e8;
+      background: var(--primary);
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
       font-size: 16px;
     }
-    button:hover { background: #1557b0; }
+    button:hover { background: var(--primary-hover); }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    .pdf-btn {
+      background: #6c5ce7;
+    }
+    .pdf-btn:hover {
+      background: #5a4bd1;
+    }
+
     .training-preview {
-      background: white;
+      background: var(--card-bg);
       padding: 20px;
       border-radius: 8px;
       margin-top: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-light);
     }
     .share-link {
       margin-top: 15px;
       padding: 10px;
-      background: #e8f0fe;
+      background: var(--share-bg);
       border-radius: 6px;
       word-break: break-all;
+    }
+
+    /* Kartice vježbi */
+    .exercise-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      position: relative;
+    }
+    .exercise-card .row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .exercise-card .row input {
+      margin: 0;
+    }
+    .exercise-card .name-input {
+      flex: 2;
+      min-width: 180px;
+    }
+    .exercise-card .sets-input {
+      flex: 1;
+      max-width: 130px;
+      min-width: 100px;
+    }
+    .exercise-card .note-input {
+      width: 100%;
+    }
+    .delete-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--delete);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      line-height: 1;
+    }
+    .delete-btn:hover { background: var(--delete-hover); }
+
+    .add-btn {
+      background: var(--add);
+      margin-bottom: 10px;
+    }
+    .add-btn:hover { background: var(--add-hover); }
+
+    .sets-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .sets-btn {
+      padding: 5px 10px;
+      font-size: 13px;
+      background: var(--sets-btn-bg);
+      color: var(--sets-btn-text);
+      border: 1px solid var(--sets-btn-border);
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    .sets-btn:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .section-title {
+      color: var(--primary);
+      font-size: 1.15em;
+      margin: 18px 0 8px 0;
+      border-bottom: 2px solid var(--section-border);
+      padding-bottom: 4px;
+    }
+    .exercise {
+      margin-bottom: 14px;
+      line-height: 1.45;
+    }
+    .exercise-name {
+      font-weight: 700;
+      font-size: 1.05em;
+    }
+    .exercise-note {
+      color: var(--text-muted);
+      font-size: 0.95em;
+      margin-top: 3px;
+      padding-left: 4px;
     }
   </style>
 </head>
 <body>
-  <h1>🎯 Generator treninga</h1>
-
-  <div class="form-group">
-    <label>Ime klijenta</label>
-    <input type="text" id="clientName" placeholder="npr. Marko Horvat">
+  <div class="header-row">
+    <h1 style="margin:0;">🎯 G3L4US TRENING🏋️‍♂️💪</h1>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">
+      🌙 Dark Mode
+    </button>
   </div>
 
-  <div class="form-group">
-    <label>Datum treninga</label>
-    <input type="date" id="date">
-  </div>
+  <div>
+    <div class="form-group">
+      <label>Ime klijenta👤</label>
+      <input type="text" id="clientName" placeholder="npr. Marko Horvat">
+    </div>
 
-  <div class="form-group">
-    <label>Naziv treninga / Program</label>
-    <input type="text" id="title" placeholder="npr. Donji dio tijela - Snaga" value="Tjedni trening">
-  </div>
+    <div class="form-group">
+      <label>Datum treninga📅</label>
+      <input type="date" id="date">
+    </div>
 
-  <div class="form-group">
-    <label>Trening </label>
-    <textarea id="workout" rows="15" placeholder="Upisuj vježbe ovdje..."></textarea>
-  </div>
+    <div class="form-group">
+      <label>Naziv treninga🖊</label>
+      <input type="text" id="title" placeholder="npr. Donji dio tijela - Snaga" value="Tjedni trening">
+    </div>
 
-  <button onclick="generateTraining()">✅ Generiraj i kopiraj link</button>
+    <!-- UVOD -->
+    <div class="form-group">
+      <label>Uvod / Zagrijavanje🔥</label>
+      <textarea id="uvod" rows="3" placeholder="npr. 5 min lagano trčanje, mobilnost kukova, aktivacija..."></textarea>
+    </div>
+
+    <!-- GLAVNI DIO -->
+    <div class="form-group">
+      <label>Glavni dio🏋️‍♂️</label>
+      <div id="exercisesContainer"></div>
+      <button type="button" class="add-btn" onclick="addExercise()">+ Dodaj vježbu</button>
+    </div>
+
+    <!-- KRAJ -->
+    <div class="form-group">
+      <label>Kraj / Cool-down 🧘</label>
+      <textarea id="kraj" rows="3" placeholder="npr. Stretching, disanje, foam rolling..."></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button onclick="generateTraining()">✅ Generiraj i kopiraj link</button>
+      <button class="pdf-btn" onclick="downloadPDF()">📄 Preuzmi PDF</button>
+    </div>
+  </div>
 
   <div id="preview" class="training-preview" style="display: none;">
     <h2 id="previewTitle"></h2>
     <p><strong>Klijent:</strong> <span id="previewClient"></span></p>
     <p><strong>Datum:</strong> <span id="previewDate"></span></p>
     <div id="previewWorkout"></div>
-    
+
     <div class="share-link">
       <strong>Share link:</strong><br>
       <span id="shareLink"></span>
@@ -86,40 +311,220 @@
   </div>
 
   <script>
-    // Automatski popuni današnji datum
+    // ============================================================
+    // 
+    // ============================================================
+    const SVE_VJEZBE = [
+      "BENCH PRESS(BARBELL)",
+      "BENCH PRESS(DUMBBELL)",
+      "BENT OVER ROW(BARBELL)",
+      "BICEPS CURL(DUMBBELL)",
+      "CABLE FLY",
+      "DEADLIFT",
+      "FACE PULL",
+      "INCLINE BENCH PRESS",
+      "HAMMER CURL",
+      "LAT PULLDOWN",
+      "LATERAL RAISE",
+      "LEG EXTENSION",
+      "LEG PRESS",
+      "LYING LEG CURL",
+      "SEATED CABLE ROW",
+      "SHOULDER PRESS",
+      "SQUAT",
+      "TRICEPS PUSHDOWN",
+      "AB SCISSOR",
+      "AB WHEEL",
+      "AIR BIKE",
+      "BACK EXTENSION",
+      "BYCYCLE CRUNCH",
+      "BIRD DOG",
+      "BULGARIAN SPLIT SQUAT",
+      "CHEST FLY(MACHINE)",
+      "CHEST FLY(DUMBBELL)",
+      "CRUNCH",
+      "DEAD BUG",
+      "FIRE HYDRANT",
+      "HEEL TOUCH",
+      "HIP ABDUCTION",
+      "HIP ADDUCTION",
+      "HIP THRUST",
+      "ISOLATERAL ROW",
+      "JACKKNIFE",
+      "LEG RAISE",
+      "LUNGE",
+      "MOUNTAIN CLIMBER",
+      "PREACHER CURL",
+      "REAR KICK",
+      "RUSSIAN TWIST",
+      "TREADMILL",
+      // 
+    ];
+
+    // ============================================================
+    //  
+    // ============================================================
+    const SETOVI = [
+      "3x8",
+      "3x10",
+      "3x12",
+      "4x6",
+      "4x8",
+      "2x20",
+      "10min",
+      "5min",
+      "2x10",
+      "2x15",
+      "max",
+      "2x6",
+      "2x8"
+      // 
+    ];
+    // ============================================================
+
+
+    // ===== DARK MODE =====
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      const isDark = document.body.classList.contains('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      document.getElementById('themeBtn').textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
+
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark');
+      document.getElementById('themeBtn').textContent = '☀️ Light Mode';
+    }
+
     document.getElementById('date').valueAsDate = new Date();
+
+    let exerciseCount = 0;
+
+    function addExercise(name = '', sets = '', note = '') {
+      exerciseCount++;
+      const id = exerciseCount;
+
+      const card = document.createElement('div');
+      card.className = 'exercise-card';
+      card.id = `exercise-${id}`;
+
+      const datalistId = `vjezbe-list-${id}`;
+
+      card.innerHTML = `
+        <button type="button" class="delete-btn" onclick="removeExercise(${id})" title="Obriši vježbu">×</button>
+        
+        <div class="row">
+          <input list="${datalistId}" type="text" class="name-input" 
+                 placeholder="Utipkaj prvo slovo vježbe..." value="${name}">
+          <datalist id="${datalistId}">
+            ${SVE_VJEZBE.map(v => `<option value="${v}">`).join('')}
+          </datalist>
+
+          <input type="text" class="sets-input" placeholder="4x8" value="${sets}">
+        </div>
+
+        <div class="sets-buttons">
+          ${SETOVI.map(s => `<button type="button" class="sets-btn" onclick="setSets(${id}, '${s}')">${s}</button>`).join('')}
+        </div>
+
+        <input type="text" class="note-input" placeholder="Bilješka (opcionalno)" value="${note}" style="margin-top:8px;">
+      `;
+
+      document.getElementById('exercisesContainer').appendChild(card);
+    }
+
+    function setSets(id, value) {
+      const card = document.getElementById(`exercise-${id}`);
+      if (card) {
+        card.querySelector('.sets-input').value = value;
+      }
+    }
+
+    function removeExercise(id) {
+      const card = document.getElementById(`exercise-${id}`);
+      if (card) card.remove();
+    }
+
+    addExercise();
+
+    function getExercises() {
+      const cards = document.querySelectorAll('.exercise-card');
+      const exercises = [];
+      cards.forEach(card => {
+        const name = card.querySelector('.name-input').value.trim();
+        const sets = card.querySelector('.sets-input').value.trim();
+        const note = card.querySelector('.note-input').value.trim();
+        if (name) {
+          exercises.push({ name, sets, note });
+        }
+      });
+      return exercises;
+    }
 
     function generateTraining() {
       const client = document.getElementById('clientName').value || "Klijent";
       const date = document.getElementById('date').value;
       const title = document.getElementById('title').value;
-      const workout = document.getElementById('workout').value;
+      const uvod = document.getElementById('uvod').value;
+      const kraj = document.getElementById('kraj').value;
+      const exercises = getExercises();
 
-      if (!workout.trim()) {
-        alert("Molim te upiši barem jednu vježbu!");
+      if (exercises.length === 0 && !uvod.trim() && !kraj.trim()) {
+        alert("Molim te upiši barem jednu vježbu ili uvod/kraj!");
         return;
       }
 
-      // Spremanje u URL (base64) - da link bude shareable
       const data = {
         client: client,
         date: date,
         title: title,
-        workout: workout
+        uvod: uvod,
+        exercises: exercises,
+        kraj: kraj
       };
 
-      const encoded = btoa(JSON.stringify(data));
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
       const shareUrl = `${window.location.origin}${window.location.pathname}#${encoded}`;
 
-      // Prikaz previewa
       document.getElementById('previewTitle').textContent = title;
       document.getElementById('previewClient').textContent = client;
       document.getElementById('previewDate').textContent = date || "Nije naveden";
-      document.getElementById('previewWorkout').innerHTML = `<pre style="white-space: pre-wrap;">${workout}</pre>`;
+
+      let workoutHtml = '';
+
+      if (uvod.trim()) {
+        workoutHtml += `
+          <div class="section-title">🔥 Uvod / Zagrijavanje</div>
+          <div style="white-space: pre-wrap; margin-bottom: 12px;">${uvod}</div>
+        `;
+      }
+
+      if (exercises.length > 0) {
+        workoutHtml += `<div class="section-title">💪 Glavni dio</div>`;
+        exercises.forEach(ex => {
+          workoutHtml += `
+            <div class="exercise">
+              <div class="exercise-name">
+                ${ex.name}
+                ${ex.sets ? `<span style="font-weight:500; color:inherit;"> – ${ex.sets}</span>` : ''}
+              </div>
+              ${ex.note ? `<div class="exercise-note">📝 ${ex.note}</div>` : ''}
+            </div>
+          `;
+        });
+      }
+
+      if (kraj.trim()) {
+        workoutHtml += `
+          <div class="section-title">🧘 Kraj / Cool-down</div>
+          <div style="white-space: pre-wrap;">${kraj}</div>
+        `;
+      }
+
+      document.getElementById('previewWorkout').innerHTML = workoutHtml;
       document.getElementById('shareLink').textContent = shareUrl;
       document.getElementById('preview').style.display = 'block';
 
-      // Kopiraj link automatski
       navigator.clipboard.writeText(shareUrl).then(() => {
         alert("✅ Link je kopiran! Pošalji ga klijentu.");
       });
@@ -131,29 +536,88 @@
       alert("Link kopiran!");
     }
 
-    // Učitavanje iz URL-a ako netko otvori share link
+    function downloadPDF() {
+      const element = document.getElementById('preview');
+      if (!element) {
+        alert("Nema sadržaja za preuzimanje. Generiraj trening prvo.");
+        return;
+      }
+
+      const opt = {
+        margin:       0.5,
+        filename:     'trening.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save();
+    }
+
+    // Učitavanje iz URL-a
     window.onload = function() {
       if (window.location.hash) {
         try {
           const encoded = window.location.hash.substring(1);
-          const data = JSON.parse(atob(encoded));
+          const data = JSON.parse(decodeURIComponent(escape(atob(encoded))));
 
           document.getElementById('clientName').value = data.client || "";
           document.getElementById('date').value = data.date || "";
           document.getElementById('title').value = data.title || "";
-          document.getElementById('workout').value = data.workout || "";
+          document.getElementById('uvod').value = data.uvod || "";
+          document.getElementById('kraj').value = data.kraj || "";
 
-          // Prikaži preview
+          document.getElementById('exercisesContainer').innerHTML = '';
+          exerciseCount = 0;
+
+          if (data.exercises && data.exercises.length > 0) {
+            data.exercises.forEach(ex => {
+              addExercise(ex.name || '', ex.sets || '', ex.note || '');
+            });
+          } else {
+            addExercise();
+          }
+
           document.getElementById('previewTitle').textContent = data.title;
           document.getElementById('previewClient').textContent = data.client;
-          document.getElementById('previewDate').textContent = data.date;
-          document.getElementById('previewWorkout').innerHTML = `<pre style="white-space: pre-wrap;">${data.workout}</pre>`;
+          document.getElementById('previewDate').textContent = data.date || "Nije naveden";
+
+          let workoutHtml = '';
+          if (data.uvod && data.uvod.trim()) {
+            workoutHtml += `
+              <div class="section-title">🔥 Uvod / Zagrijavanje</div>
+              <div style="white-space: pre-wrap; margin-bottom: 12px;">${data.uvod}</div>
+            `;
+          }
+          if (data.exercises && data.exercises.length > 0) {
+            workoutHtml += `<div class="section-title">💪 Glavni dio</div>`;
+            data.exercises.forEach(ex => {
+              workoutHtml += `
+                <div class="exercise">
+                  <div class="exercise-name">
+                    ${ex.name}
+                    ${ex.sets ? `<span style="font-weight:500; color:inherit;"> – ${ex.sets}</span>` : ''}
+                  </div>
+                  ${ex.note ? `<div class="exercise-note">📝 ${ex.note}</div>` : ''}
+                </div>
+              `;
+            });
+          }
+          if (data.kraj && data.kraj.trim()) {
+            workoutHtml += `
+              <div class="section-title">🧘 Kraj / Cool-down</div>
+              <div style="white-space: pre-wrap;">${data.kraj}</div>
+            `;
+          }
+
+          document.getElementById('previewWorkout').innerHTML = workoutHtml;
           document.getElementById('preview').style.display = 'block';
         } catch(e) {
-          console.log("Neispravan link");
+          console.log("Neispravan link", e);
         }
       }
     };
   </script>
 </body>
 </html>
+ 
