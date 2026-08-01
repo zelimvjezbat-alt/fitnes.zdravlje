@@ -536,23 +536,55 @@
       alert("Link kopiran!");
     }
 
-    function downloadPDF() {
-      const element = document.getElementById('preview');
+    function downloadPDF(){
+      const element=document.getElementById('preview');
       if (!element) {
         alert("Nema sadržaja za preuzimanje. Generiraj trening prvo.");
         return;
       }
+      const clone=element.cloneNode(true);
+      clone.style.width= element.offsetWidth + 'px';
+      clone.style.fontSize='11px';
+      clone.style.lineHeight='1.25';
+      clone.style.padding='8px';
+      clone.style.boxSizing='border-box'; 
+      clone.style.position='absolute';
+      clone.style.top='0';
+      clone.style.left='-9999px';
+      clone.style.backgroundColor='#fff';
+
+      document.body.appendChild(clone);
+      
+
 
       const opt = {
-        margin:       0.5,
-        filename:     'trening.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        margin: [0.3, 0.3, 0.3, 0.3],
+        filenam : 'Trening.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale:1.8,
+          useCORS: true,
+          scrollY: 0,
+          scrollX: 0,
+          logging: false
+        },
+        jsPDF: {
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait'
+        },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
-
-      html2pdf().set(opt).from(element).save();
+      
+      html2pdf()
+      .set(opt)
+      .from(element)
+      .save()
+      .then(() => {
+        document.body.removeChild(clone);
+      });
     }
+
 
     // Učitavanje iz URL-a
     window.onload = function() {
