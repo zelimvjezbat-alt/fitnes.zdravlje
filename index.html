@@ -1,25 +1,29 @@
+```html
 <!DOCTYPE html>
 <html lang="hr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
   <title>G3L4US Trening</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
     :root {
-      --bg: #f0f2f5;
+      --bg: #f1f5f9;
       --card-bg: #ffffff;
-      --text: #1a1a1a;
-      --text-muted: #6b7280;
+      --text: #0f172a;
+      --text-muted: #64748b;
       --primary: #2563eb;
       --primary-hover: #1d4ed8;
       --primary-light: #dbeafe;
-      --border: #e5e7eb;
-      --border-light: #f3f4f6;
+      --primary-dark: #1e40af;
+      --border: #e2e8f0;
+      --border-light: #f1f5f9;
       --delete: #ef4444;
-      --add: #10b981;
-      --add-hover: #059669;
-      --shadow: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
       --radius: 10px;
     }
 
@@ -28,77 +32,100 @@
       --card-bg: #1e293b;
       --text: #f1f5f9;
       --text-muted: #94a3b8;
-      --primary: #60a5fa;
-      --primary-hover: #3b82f6;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
       --primary-light: #1e3a5f;
+      --primary-dark: #60a5fa;
       --border: #334155;
       --border-light: #1e293b;
       --delete: #f87171;
-      --add: #34d399;
-      --add-hover: #10b981;
-      --shadow: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       max-width: 640px;
       margin: 0 auto;
-      padding: 12px;
+      padding: 18px 20px 28px;
       background: var(--bg);
       color: var(--text);
-      transition: background 0.2s, color 0.2s;
-      line-height: 1.4;
+      line-height: 1.45;
     }
 
     .header-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
-      gap: 10px;
+      margin-bottom: 18px;
+      gap: 12px;
     }
 
-    h1 {
-      font-size: 1.25rem;
-      font-weight: 700;
+    .logo {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
       color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .logo span {
+      background: var(--primary);
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      letter-spacing: 0.06em;
     }
 
     .theme-toggle {
       background: var(--card-bg);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 6px 12px;
+      padding: 7px 14px;
       border-radius: 20px;
       cursor: pointer;
       font-size: 13px;
-      flex-shrink: 0;
+      font-weight: 600;
     }
 
-    .form-group { margin-bottom: 10px; }
+    .theme-toggle:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
 
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 10px;
+      gap: 12px;
+      margin-bottom: 12px;
     }
 
     label {
       display: block;
-      margin-bottom: 3px;
+      margin-bottom: 4px;
       font-weight: 600;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.04em;
     }
 
-    input, textarea {
+    input,
+    textarea {
       width: 100%;
-      padding: 9px 12px;
+      padding: 10px 13px;
       border: 1px solid var(--border);
       border-radius: var(--radius);
       font-size: 15px;
@@ -107,13 +134,17 @@
       -webkit-appearance: none;
     }
 
-    input:focus, textarea:focus {
+    input:focus,
+    textarea:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 3px var(--primary-light);
     }
 
-    textarea { resize: vertical; min-height: 60px; }
+    textarea {
+      resize: vertical;
+      min-height: 64px;
+    }
 
     button {
       padding: 12px 16px;
@@ -126,52 +157,60 @@
       font-weight: 600;
     }
 
-    button:hover { background: var(--primary-hover); }
+    button:hover {
+      background: var(--primary-hover);
+    }
 
     .pdf-btn {
-      background: #7c3aed;
+      background: var(--primary-dark);
       width: 100%;
-      margin-top: 6px;
+      margin-top: 8px;
       font-size: 16px;
       padding: 14px;
     }
-    .pdf-btn:hover { background: #6d28d9; }
-    .pdf-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .pdf-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
 
     .add-btn {
-      background: var(--add);
+      background: var(--primary);
       width: 100%;
-      margin-top: 6px;
-      padding: 10px;
+      margin-top: 8px;
+      padding: 11px;
       font-size: 14px;
     }
-    .add-btn:hover { background: var(--add-hover); }
 
     .exercise-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 10px 12px;
-      margin-bottom: 8px;
+      padding: 12px 14px 12px 12px;
+      margin-bottom: 10px;
       position: relative;
       box-shadow: var(--shadow);
     }
 
     .exercise-card .row {
       display: flex;
-      gap: 8px;
-      margin-bottom: 6px;
+      gap: 10px;
+      margin-bottom: 8px;
+      padding-right: 28px;
     }
 
-    .exercise-card .name-input { flex: 1; min-width: 0; }
+    .exercise-card .name-input {
+      flex: 1;
+      min-width: 0;
+    }
 
     .exercise-card .sets-wrap {
       position: relative;
-      width: 90px;
+      width: 92px;
       flex-shrink: 0;
     }
 
-    .exercise-card .sets-input {
+    .sets-input {
       width: 100%;
       text-align: center;
       font-weight: 600;
@@ -187,14 +226,16 @@
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 8px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.14);
       z-index: 50;
       max-height: 200px;
       overflow-y: auto;
-      margin-top: 2px;
+      margin-top: 3px;
     }
 
-    .sets-dropdown.show { display: block; }
+    .sets-dropdown.show {
+      display: block;
+    }
 
     .sets-option {
       padding: 8px 10px;
@@ -205,8 +246,11 @@
       border-bottom: 1px solid var(--border-light);
     }
 
-    .sets-option:last-child { border-bottom: none; }
-    .sets-option:hover, .sets-option:active {
+    .sets-option:last-child {
+      border-bottom: none;
+    }
+
+    .sets-option:hover {
       background: var(--primary-light);
       color: var(--primary);
     }
@@ -214,444 +258,1492 @@
     .note-input {
       width: 100%;
       font-size: 13px;
-      padding: 7px 10px;
+      padding: 8px 11px;
     }
 
     .delete-btn {
       position: absolute;
-      top: 6px;
-      right: 6px;
+      top: 8px;
+      right: 8px;
       background: transparent;
-      color: var(--delete);
-      border: none;
+      color: var(--text-muted);
+      border: 1px solid transparent;
       font-size: 18px;
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 0;
-      line-height: 1;
     }
-    .delete-btn:hover { background: var(--delete); color: white; }
 
-    /* PREVIEW + pozadinska slika */
-    .training-preview {
-      background-color: var(--card-bg) !important;
-      background-image: url('pozadina.jpg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      color: var(--text);
-      padding: 24px;
-      border-radius: 8px;
-      margin-top: 20px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border);
-      display: none;
-      position: relative;
+    .delete-btn:hover {
+      background: var(--delete);
+      color: #fff;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--primary-dark);
+      color: #fff;
+      padding: 12px 22px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s, transform 0.25s;
+      z-index: 1000;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* =========================
+       PDF PREVIEW
+       ========================= */
+
+    #preview {
+      width: 794px;
+      min-height: 1122px;
+      position: fixed;
+      left: -10000px;
+      top: 0;
       overflow: hidden;
-      min-height: 1050px;
+      background: #111;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    .training-preview::before {
-      content: '';
+    #preview .bg-img {
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255, 255, 255, 0);
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
       z-index: 0;
     }
 
-    .training-preview > * {
+    #preview .pdf-content {
       position: relative;
       z-index: 1;
+      padding: 42px 48px;
+      min-height: 1122px;
     }
 
-    .training-preview h2 {
-      color: #ffffff;
-      font-size: 1.5rem;
+    #preview .pdf-header {
+      text-align: center;
+      margin-bottom: 26px;
+      padding-bottom: 14px;
+      border-bottom: 2px solid rgba(255,255,255,0.55);
+    }
+
+    #preview .pdf-title {
+      font-size: 26px;
       font-weight: 900;
-      margin-bottom: 8px;
+      color: #fff;
+      margin-bottom: 10px;
       text-shadow:
+        0 0 6px #000,
         -1px -1px 0 #000,
-        1px -1px 0 #000,
-        -1px  1px 0 #000,
-        1px  1px 0 #000,
-        0 0 4px #000;
+        1px 1px 0 #000;
     }
 
-    .training-preview .meta {
-      font-size: 0.95rem;
-      color: #ffffff;
+    #preview .pdf-meta {
+      font-size: 15px;
       font-weight: 700;
-      margin-bottom: 14px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid rgba(255,255,255,0.6);
+      color: #fff;
       text-shadow:
+        0 0 4px #000,
         -1px -1px 0 #000,
-         1px -1px 0 #000,
-        -1px  1px 0 #000,
-        1px  1px 0 #000;
+        1px 1px 0 #000;
+      line-height: 1.5;
     }
 
-    .section-title {
-      color: #ffeb3b;          /* jarko žuta */
-      font-size: 1.15em;
+    #preview .pdf-section {
+      background: rgba(0,0,0,0.48);
+      border: 1px solid rgba(255,255,255,0.28);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+    }
+
+    #preview .pdf-section-title {
+      font-size: 17px;
       font-weight: 900;
-      margin: 16px 0 8px 0;
-      border-bottom: 2px solid #ffeb3b;
-      padding-bottom: 4px;
-      text-shadow:
-        -1px -1px 0 #000,
-         1px -1px 0 #000,
-        -1px  1px 0 #000,
-        1px  1px 0 #000,
-        0 0 3px #000;
-    }
-
-    .exercise {
+      color: #ffeb3b;
       margin-bottom: 12px;
-      line-height: 1.45;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #ffeb3b;
+      text-shadow:
+        0 0 3px #000,
+        -1px -1px 0 #000,
+        1px 1px 0 #000;
     }
 
-    .exercise-name {
-      font-weight: 900;
-      font-size: 1.08em;
-      color: #ffffff;
-      text-shadow:
-        -1px -1px 0 #000,
-         1px -1px 0 #000,
-        -1px  1px 0 #000,
-         1px  1px 0 #000,
+    #preview .pdf-text {
+      font-size: 14px;
+      line-height: 1.55;
+      color: #f1f5f9;
+      white-space: pre-wrap;
+      text-shadow: 0 0 2px #000;
     }
 
-    .exercise-note {
-      color: #e0e0e0;
-      font-size: 0.95em;  
-      text-shadow:
-        -1px -1px 0 #000,
-         1px -1px 0 #000,
-        -1px  1px 0 #000,
-         1px  1px 0 #000;
+    #preview .pdf-exercise {
+      background: rgba(255,255,255,0.10);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      border-left: 4px solid #ffeb3b;
+    }
+
+    #preview .pdf-exercise:last-child {
+      margin-bottom: 0;
+    }
+
+    #preview .pdf-exercise-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 0 0 2px #000;
+    }
+
+    #preview .pdf-exercise-sets {
+      font-weight: 600;
+      color: #ffeb3b;
+      margin-left: 6px;
+    }
+
+    #preview .pdf-exercise-note {
+      font-size: 13px;
+      color: #e2e8f0;
+      margin-top: 3px;
+      text-shadow: 0 0 2px #000;
     }
 
     @media (max-width: 480px) {
-      body { padding: 10px; }
-      h1 { font-size: 1.1rem; }
-      .form-row { grid-template-columns: 1fr; gap: 8px; }
-      .exercise-card .row { flex-direction: column; }
-      .exercise-card .sets-wrap { width: 100%; }
+      body {
+        padding: 14px 14px 24px;
+      }
+
+      .logo {
+        font-size: 1.2rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .exercise-card .row {
+        flex-direction: column;
+        padding-right: 0;
+      }
+
+      .exercise-card .sets-wrap {
+        width: 100%;
+      }
     }
   </style>
 </head>
+
 <body>
+
   <div class="header-row">
-    <h1>🎯 G3L4US TRENING</h1>
-    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
+    <div class="logo">
+      G3L4US <span>TRENING</span>
+    </div>
+
+    <button
+      class="theme-toggle"
+      onclick="toggleTheme()"
+      id="themeBtn"
+    >
+      Tamno
+    </button>
   </div>
+
 
   <div class="form-row">
+
     <div class="form-group" style="margin:0">
       <label>Ime klijenta</label>
-      <input type="text" id="clientName" placeholder="npr. Marko">
+
+      <input
+        type="text"
+        id="clientName"
+        placeholder="npr. Marko"
+      >
     </div>
+
+
     <div class="form-group" style="margin:0">
       <label>Datum</label>
-      <input type="date" id="date">
+
+      <input
+        type="date"
+        id="date"
+      >
     </div>
+
   </div>
 
+
   <div class="form-group">
+
     <label>Naziv treninga</label>
-    <input type="text" id="title" placeholder="npr. Donji dio - Snaga" value="Tjedni trening">
+
+    <input
+      type="text"
+      id="title"
+      placeholder="npr. Donji dio - Snaga"
+      value="Tjedni trening"
+    >
+
   </div>
 
-  <div class="form-group">
-    <label>Uvod / Zagrijavanje 🔥</label>
-    <textarea id="uvod" rows="2" placeholder="5 min trčanje, mobilnost..."></textarea>
-  </div>
 
   <div class="form-group">
-    <label>Glavni dio 💪</label>
+
+    <label>Uvod / Zagrijavanje</label>
+
+    <textarea
+      id="uvod"
+      rows="2"
+      placeholder="5 min trcanje, mobilnost..."
+    ></textarea>
+
+  </div>
+
+
+  <div class="form-group">
+
+    <label>Glavni dio</label>
+
     <div id="exercisesContainer"></div>
-    <button type="button" class="add-btn" onclick="addExercise()">+ Dodaj vježbu</button>
+
+    <button
+      type="button"
+      class="add-btn"
+      onclick="addExercise()"
+    >
+      + Dodaj vjezbu
+    </button>
+
   </div>
+
 
   <div class="form-group">
-    <label>Kraj / Cool-down 🧘</label>
-    <textarea id="kraj" rows="2" placeholder="Stretching, foam rolling..."></textarea>
+
+    <label>Kraj / Cool-down</label>
+
+    <textarea
+      id="kraj"
+      rows="2"
+      placeholder="Stretching, foam rolling..."
+    ></textarea>
+
   </div>
 
-  <button class="pdf-btn" id="pdfBtn" onclick="downloadPDF()">📄 Generiraj i preuzmi PDF</button>
 
-  <div id="preview" class="training-preview">
-    <h2 id="previewTitle"></h2>
-    <div class="meta">
-      <strong>Klijent:</strong> <span id="previewClient"></span><br>
-      <strong>Datum:</strong> <span id="previewDate"></span>
+  <button
+    class="pdf-btn"
+    id="pdfBtn"
+    onclick="downloadPDF()"
+  >
+    Generiraj i preuzmi PDF
+  </button>
+
+
+  <!-- =========================
+       PDF PREVIEW
+       ========================= -->
+
+  <div id="preview">
+
+    <img
+      class="bg-img"
+      src="pozadina.jpg"
+      alt=""
+    >
+
+    <div class="pdf-content">
+
+      <div class="pdf-header">
+
+        <div
+          class="pdf-title"
+          id="previewTitle"
+        ></div>
+
+        <div class="pdf-meta">
+
+          <strong>Klijent:</strong>
+          <span id="previewClient"></span>
+
+          <br>
+
+          <strong>Datum:</strong>
+          <span id="previewDate"></span>
+
+        </div>
+
+      </div>
+
+
+      <div id="previewWorkout"></div>
+
     </div>
-    <div id="previewWorkout"></div>
+
   </div>
+
+
+  <div
+    id="toast"
+    class="toast"
+  >
+    PDF uspjesno spremljen!
+  </div>
+
 
   <script>
+
     const SVE_VJEZBE = [
-      "BENCH PRESS(BARBELL)","BENCH PRESS(DUMBBELL)","BENT OVER ROW(BARBELL)",
-      "BICEPS CURL(DUMBBELL)","CABLE FLY","DEADLIFT","FACE PULL",
-      "INCLINE BENCH PRESS","HAMMER CURL","LAT PULLDOWN","LATERAL RAISE",
-      "LEG EXTENSION","LEG PRESS","LYING LEG CURL","SEATED CABLE ROW",
-      "SHOULDER PRESS","SQUAT","TRICEPS PUSHDOWN","AB SCISSOR","AB WHEEL",
-      "AIR BIKE","BACK EXTENSION","BYCYCLE CRUNCH","BIRD DOG",
-      "BULGARIAN SPLIT SQUAT","CHEST FLY(MACHINE)","CHEST FLY(DUMBBELL)",
-      "CRUNCH","DEAD BUG","FIRE HYDRANT","HEEL TOUCH","HIP ABDUCTION",
-      "HIP ADDUCTION","HIP THRUST","ISOLATERAL ROW","JACKKNIFE","LEG RAISE",
-      "LUNGE","MOUNTAIN CLIMBER","PREACHER CURL","REAR KICK","RUSSIAN TWIST",
+      "BENCH PRESS(BARBELL)",
+      "BENCH PRESS(DUMBBELL)",
+      "BENT OVER ROW(BARBELL)",
+      "BICEPS CURL(DUMBBELL)",
+      "CABLE FLY",
+      "DEADLIFT",
+      "FACE PULL",
+      "INCLINE BENCH PRESS",
+      "HAMMER CURL",
+      "LAT PULLDOWN",
+      "LATERAL RAISE",
+      "LEG EXTENSION",
+      "LEG PRESS",
+      "LYING LEG CURL",
+      "SEATED CABLE ROW",
+      "SHOULDER PRESS",
+      "SQUAT",
+      "TRICEPS PUSHDOWN",
+      "AB SCISSOR",
+      "AB WHEEL",
+      "AIR BIKE",
+      "BACK EXTENSION",
+      "BYCYCLE CRUNCH",
+      "BIRD DOG",
+      "BULGARIAN SPLIT SQUAT",
+      "CHEST FLY(MACHINE)",
+      "CHEST FLY(DUMBBELL)",
+      "CRUNCH",
+      "DEAD BUG",
+      "FIRE HYDRANT",
+      "HEEL TOUCH",
+      "HIP ABDUCTION",
+      "HIP ADDUCTION",
+      "HIP THRUST",
+      "ISOLATERAL ROW",
+      "JACKKNIFE",
+      "LEG RAISE",
+      "LUNGE",
+      "MOUNTAIN CLIMBER",
+      "PREACHER CURL",
+      "REAR KICK",
+      "RUSSIAN TWIST",
       "TREADMILL"
     ];
 
+
     const SETOVI = [
-      "3x8","3x10","3x12","4x6","4x8","2x20","10min","5min",
-      "2x10","2x15","max","2x6","2x8"
+      "3x8",
+      "3x10",
+      "3x12",
+      "4x6",
+      "4x8",
+      "2x20",
+      "10min",
+      "5min",
+      "2x10",
+      "2x15",
+      "max",
+      "2x6",
+      "2x8"
     ];
 
+
     function toggleTheme() {
-      document.body.classList.toggle('dark');
-      var isDark = document.body.classList.contains('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
+
+      document.body.classList.toggle("dark");
+
+      const isDark =
+        document.body.classList.contains("dark");
+
+      localStorage.setItem(
+        "theme",
+        isDark ? "dark" : "light"
+      );
+
+      document.getElementById(
+        "themeBtn"
+      ).textContent =
+        isDark ? "Svijetlo" : "Tamno";
     }
 
-    if (localStorage.getItem('theme') === 'dark') {
-      document.body.classList.add('dark');
-      document.getElementById('themeBtn').textContent = '☀️';
+
+    if (
+      localStorage.getItem("theme") === "dark"
+    ) {
+
+      document.body.classList.add("dark");
+
+      document.getElementById(
+        "themeBtn"
+      ).textContent = "Svijetlo";
     }
 
-    document.getElementById('date').valueAsDate = new Date();
 
-    var exerciseCount = 0;
+    document.getElementById(
+      "date"
+    ).valueAsDate = new Date();
 
-    function addExercise(name, sets, note) {
-      name = name || '';
-      sets = sets || '';
-      note = note || '';
+
+    let exerciseCount = 0;
+
+
+    function addExercise(
+      name = "",
+      sets = "",
+      note = ""
+    ) {
+
       exerciseCount++;
-      var id = exerciseCount;
-      var card = document.createElement('div');
-      card.className = 'exercise-card';
-      card.id = 'exercise-' + id;
 
-      var opts = '';
-      for (var i = 0; i < SVE_VJEZBE.length; i++) {
-        opts += '<option value="' + SVE_VJEZBE[i] + '">';
+      const id = exerciseCount;
+
+      const card =
+        document.createElement("div");
+
+      card.className =
+        "exercise-card";
+
+      card.id =
+        "exercise-" + id;
+
+
+      let opts = "";
+
+      for (
+        let i = 0;
+        i < SVE_VJEZBE.length;
+        i++
+      ) {
+
+        opts +=
+          '<option value="' +
+          escapeHtmlAttr(
+            SVE_VJEZBE[i]
+          ) +
+          '">';
       }
 
-      var setBtns = '';
-      for (var j = 0; j < SETOVI.length; j++) {
-        setBtns += '<div class="sets-option" onclick="setSets(' + id + ', \'' + SETOVI[j] + '\')">' + SETOVI[j] + '</div>';
+
+      let setBtns = "";
+
+      for (
+        let j = 0;
+        j < SETOVI.length;
+        j++
+      ) {
+
+        setBtns +=
+          '<div class="sets-option" ' +
+          'onclick="setSets(' +
+          id +
+          ', \'' +
+          SETOVI[j] +
+          '\')">' +
+          SETOVI[j] +
+          '</div>';
       }
+
 
       card.innerHTML =
-        '<button type="button" class="delete-btn" onclick="removeExercise(' + id + ')" title="Obrisi">×</button>' +
-        '<div class="row">' +
-          '<input list="vjezbe-list-' + id + '" type="text" class="name-input" placeholder="Utipkaj vjezbu..." value="' + name.replace(/"/g, '&quot;') + '">' +
-          '<datalist id="vjezbe-list-' + id + '">' + opts + '</datalist>' +
-          '<div class="sets-wrap">' +
-            '<input type="text" class="sets-input" placeholder="serije" value="' + sets.replace(/"/g, '&quot;') + '" readonly onclick="toggleSetsDropdown(' + id + ')" id="sets-input-' + id + '">' +
-            '<div class="sets-dropdown" id="sets-drop-' + id + '">' + setBtns + '</div>' +
-          '</div>' +
-        '</div>' +
-        '<input type="text" class="note-input" placeholder="Biljeska (opcionalno)" value="' + note.replace(/"/g, '&quot;') + '">';
 
-      document.getElementById('exercisesContainer').appendChild(card);
+        '<button type="button" ' +
+        'class="delete-btn" ' +
+        'onclick="removeExercise(' +
+        id +
+        ')" ' +
+        'title="Obrisi">×</button>' +
+
+        '<div class="row">' +
+
+        '<input ' +
+        'list="vjezbe-list-' +
+        id +
+        '" ' +
+        'type="text" ' +
+        'class="name-input" ' +
+        'placeholder="Utipkaj vjezbu..." ' +
+        'value="' +
+        escapeHtmlAttr(name) +
+        '">' +
+
+        '<datalist id="vjezbe-list-' +
+        id +
+        '">' +
+        opts +
+        '</datalist>' +
+
+        '<div class="sets-wrap">' +
+
+        '<input ' +
+        'type="text" ' +
+        'class="sets-input" ' +
+        'placeholder="serije" ' +
+        'value="' +
+        escapeHtmlAttr(sets) +
+        '" ' +
+        'readonly ' +
+        'onclick="toggleSetsDropdown(' +
+        id +
+        ')" ' +
+        'id="sets-input-' +
+        id +
+        '">' +
+
+        '<div ' +
+        'class="sets-dropdown" ' +
+        'id="sets-drop-' +
+        id +
+        '">' +
+        setBtns +
+        '</div>' +
+
+        '</div>' +
+
+        '</div>' +
+
+        '<input ' +
+        'type="text" ' +
+        'class="note-input" ' +
+        'placeholder="Biljeska (opcionalno)" ' +
+        'value="' +
+        escapeHtmlAttr(note) +
+        '">';
+
+
+      document
+        .getElementById(
+          "exercisesContainer"
+        )
+        .appendChild(card);
     }
+
+
+    function escapeHtmlAttr(value) {
+
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+
+    function escapeHtml(value) {
+
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
 
     function toggleSetsDropdown(id) {
-      var all = document.querySelectorAll('.sets-dropdown.show');
-      for (var i = 0; i < all.length; i++) {
-        if (all[i].id !== 'sets-drop-' + id) all[i].classList.remove('show');
-      }
-      var drop = document.getElementById('sets-drop-' + id);
-      if (drop) drop.classList.toggle('show');
-    }
 
-    function setSets(id, value) {
-      var input = document.getElementById('sets-input-' + id);
-      if (input) input.value = value;
-      var drop = document.getElementById('sets-drop-' + id);
-      if (drop) drop.classList.remove('show');
-    }
+      const all =
+        document.querySelectorAll(
+          ".sets-dropdown.show"
+        );
 
-    document.addEventListener('click', function(e) {
-      if (!e.target.closest || !e.target.closest('.sets-wrap')) {
-        var all = document.querySelectorAll('.sets-dropdown.show');
-        for (var i = 0; i < all.length; i++) all[i].classList.remove('show');
-      }
-    });
+      for (
+        let i = 0;
+        i < all.length;
+        i++
+      ) {
 
-    function removeExercise(id) {
-      var card = document.getElementById('exercise-' + id);
-      if (card) card.remove();
-    }
+        if (
+          all[i].id !==
+          "sets-drop-" + id
+        ) {
 
-    addExercise();
-
-    function getExercises() {
-      var cards = document.querySelectorAll('.exercise-card');
-      var exercises = [];
-      for (var i = 0; i < cards.length; i++) {
-        var name = cards[i].querySelector('.name-input').value.trim();
-        var sets = cards[i].querySelector('.sets-input').value.trim();
-        var note = cards[i].querySelector('.note-input').value.trim();
-        if (name) exercises.push({ name: name, sets: sets, note: note });
-      }
-      return exercises;
-    }
-
-    function fillPreview() {
-      var client = document.getElementById('clientName').value || 'Klijent';
-      var date = document.getElementById('date').value;
-      var title = document.getElementById('title').value || 'Trening';
-      var uvod = document.getElementById('uvod').value;
-      var kraj = document.getElementById('kraj').value;
-      var exercises = getExercises();
-
-      if (exercises.length === 0 && !uvod.trim() && !kraj.trim()) {
-        return false;
-      }
-
-      document.getElementById('previewTitle').textContent = title;
-      document.getElementById('previewClient').textContent = client;
-      document.getElementById('previewDate').textContent = date || 'Nije naveden';
-
-      var html = '';
-
-      if (uvod.trim()) {
-        html += '<div class="section-title">Uvod / Zagrijavanje</div>';
-        html += '<div style="white-space:pre-wrap;margin-bottom:12px;">' + uvod.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
-      }
-
-      if (exercises.length > 0) {
-        html += '<div class="section-title">Glavni dio</div>';
-        for (var i = 0; i < exercises.length; i++) {
-          var ex = exercises[i];
-          html += '<div class="exercise">';
-          html += '<div class="exercise-name">' + ex.name.replace(/</g,'&lt;').replace(/>/g,'&gt;');
-          if (ex.sets) {
-            html += ' <span style="font-weight:500;"> – ' + ex.sets.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</span>';
-          }
-          html += '</div>';
-          if (ex.note) {
-            html += '<div class="exercise-note">' + ex.note.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
-          }
-          html += '</div>';
+          all[i].classList.remove(
+            "show"
+          );
         }
       }
 
-      if (kraj.trim()) {
-        html += '<div class="section-title">Kraj / Cool-down</div>';
-        html += '<div style="white-space:pre-wrap;">' + kraj.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
+
+      const drop =
+        document.getElementById(
+          "sets-drop-" + id
+        );
+
+      if (drop) {
+        drop.classList.toggle("show");
+      }
+    }
+
+
+    function setSets(id, value) {
+
+      const input =
+        document.getElementById(
+          "sets-input-" + id
+        );
+
+      if (input) {
+        input.value = value;
       }
 
-      document.getElementById('previewWorkout').innerHTML = html;
-      document.getElementById('preview').style.display = 'block';
+
+      const drop =
+        document.getElementById(
+          "sets-drop-" + id
+        );
+
+      if (drop) {
+        drop.classList.remove("show");
+      }
+    }
+
+
+    document.addEventListener(
+      "click",
+      function(e) {
+
+        if (
+          !e.target.closest ||
+          !e.target.closest(".sets-wrap")
+        ) {
+
+          const all =
+            document.querySelectorAll(
+              ".sets-dropdown.show"
+            );
+
+          for (
+            let i = 0;
+            i < all.length;
+            i++
+          ) {
+
+            all[i].classList.remove(
+              "show"
+            );
+          }
+        }
+      }
+    );
+
+
+    function removeExercise(id) {
+
+      const card =
+        document.getElementById(
+          "exercise-" + id
+        );
+
+      if (card) {
+        card.remove();
+      }
+    }
+
+
+    addExercise();
+
+
+    function getExercises() {
+
+      const cards =
+        document.querySelectorAll(
+          ".exercise-card"
+        );
+
+      const exercises = [];
+
+
+      for (
+        let i = 0;
+        i < cards.length;
+        i++
+      ) {
+
+        const name =
+          cards[i]
+            .querySelector(".name-input")
+            .value
+            .trim();
+
+        const sets =
+          cards[i]
+            .querySelector(".sets-input")
+            .value
+            .trim();
+
+        const note =
+          cards[i]
+            .querySelector(".note-input")
+            .value
+            .trim();
+
+
+        if (name) {
+
+          exercises.push({
+            name: name,
+            sets: sets,
+            note: note
+          });
+        }
+      }
+
+
+      return exercises;
+    }
+
+
+    function fillPreview() {
+
+      const client =
+        document.getElementById(
+          "clientName"
+        ).value ||
+        "Klijent";
+
+      const date =
+        document.getElementById(
+          "date"
+        ).value;
+
+      const title =
+        document.getElementById(
+          "title"
+        ).value ||
+        "Trening";
+
+      const uvod =
+        document.getElementById(
+          "uvod"
+        ).value;
+
+      const kraj =
+        document.getElementById(
+          "kraj"
+        ).value;
+
+      const exercises =
+        getExercises();
+
+
+      if (
+        exercises.length === 0 &&
+        !uvod.trim() &&
+        !kraj.trim()
+      ) {
+
+        return false;
+      }
+
+
+      document.getElementById(
+        "previewTitle"
+      ).textContent =
+        title;
+
+
+      document.getElementById(
+        "previewClient"
+      ).textContent =
+        client;
+
+
+      document.getElementById(
+        "previewDate"
+      ).textContent =
+        date ||
+        "Nije naveden";
+
+
+      let html = "";
+
+
+      if (uvod.trim()) {
+
+        html +=
+          '<div class="pdf-section">' +
+
+          '<div class="pdf-section-title">' +
+          "Uvod / Zagrijavanje" +
+          "</div>" +
+
+          '<div class="pdf-text">' +
+          escapeHtml(uvod) +
+          "</div>" +
+
+          "</div>";
+      }
+
+
+      if (exercises.length > 0) {
+
+        html +=
+          '<div class="pdf-section">' +
+
+          '<div class="pdf-section-title">' +
+          "Glavni dio" +
+          "</div>";
+
+
+        for (
+          let i = 0;
+          i < exercises.length;
+          i++
+        ) {
+
+          const ex =
+            exercises[i];
+
+
+          html +=
+            '<div class="pdf-exercise">' +
+
+            '<div class="pdf-exercise-name">' +
+
+            escapeHtml(ex.name);
+
+
+          if (ex.sets) {
+
+            html +=
+              '<span class="pdf-exercise-sets">' +
+              " – " +
+              escapeHtml(ex.sets) +
+              "</span>";
+          }
+
+
+          html += "</div>";
+
+
+          if (ex.note) {
+
+            html +=
+              '<div class="pdf-exercise-note">' +
+              escapeHtml(ex.note) +
+              "</div>";
+          }
+
+
+          html += "</div>";
+        }
+
+
+        html += "</div>";
+      }
+
+
+      if (kraj.trim()) {
+
+        html +=
+          '<div class="pdf-section">' +
+
+          '<div class="pdf-section-title">' +
+          "Kraj / Cool-down" +
+          "</div>" +
+
+          '<div class="pdf-text">' +
+          escapeHtml(kraj) +
+          "</div>" +
+
+          "</div>";
+      }
+
+
+      document.getElementById(
+        "previewWorkout"
+      ).innerHTML =
+        html;
+
+
       return true;
     }
 
-    function downloadPDF() {
+
+    function showToast(msg) {
+
+      const t =
+        document.getElementById(
+          "toast"
+        );
+
+      t.textContent =
+        msg ||
+        "PDF uspjesno spremljen!";
+
+      t.classList.add("show");
+
+
+      setTimeout(
+        function() {
+
+          t.classList.remove("show");
+
+        },
+        2800
+      );
+    }
+
+
+    /*
+     * ============================
+     * NOVI PDF SUSTAV
+     * ============================
+     *
+     * Više NE koristimo html2pdf().
+     *
+     * HTML -> html2canvas -> PNG -> jsPDF
+     *
+     * To izbjegava problem s praznom
+     * stranicom koji se događao s
+     * html2pdf klonom.
+     */
+
+    async function downloadPDF() {
+
       if (!fillPreview()) {
-        alert('Upisi barem jednu vjezbu ili uvod/kraj!');
+
+        alert(
+          "Upisi barem jednu vjezbu ili uvod/kraj!"
+        );
+
         return;
       }
 
-      var btn = document.getElementById('pdfBtn');
+
+      const btn =
+        document.getElementById(
+          "pdfBtn"
+        );
+
+
       btn.disabled = true;
-      btn.textContent = 'Generiram PDF...';
 
-      var element = document.getElementById('preview');
+      btn.textContent =
+        "Generiram PDF...";
 
-      var clone = element.cloneNode(true);
-      clone.style.width = element.offsetWidth + 'px';
-      clone.style.fontSize = '11px';
-      clone.style.lineHeight = '1.25';
-      clone.style.padding = '8px';
-      clone.style.boxSizing = 'border-box';
-      clone.style.position = 'absolute';
-      clone.style.top = '0';
-      clone.style.left = '-9999px';
-      clone.style.backgroundColor = '#fff';
-      clone.style.color = '#222';
-      clone.style.display = 'block';
-      clone.style.backgroundImage = "url('pozadina.jpg')";
-      clone.style.backgroundSize = 'cover';
-      clone.style.backgroundPosition = 'center';
-      clone.style.backgroundRepeat = 'no-repeat';
-      clone.style.minHeight = '1050px';
-      
 
-      document.body.appendChild(clone);
+      const preview =
+        document.getElementById(
+          "preview"
+        );
 
-      var title = document.getElementById('title').value || 'Trening';
 
-      var opt = {
-        margin: [0.3, 0.3, 0.3, 0.3],
-        filename: (title.replace(/[^a-zA-Z0-9cćžšđČĆŽŠĐ ]/gi, '').trim() || 'Trening') + '.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: {
-          scale: 1.8,
-          useCORS: true,
-          scrollY: 0,
-          scrollX: 0,
-          logging: false
-        },
-        jsPDF: {
-          unit: 'mm',
-          format: 'a4',
-          orientation: 'portrait'
-        },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-      };
+      try {
 
-      html2pdf()
-        .set(opt)
-        .from(element)
-        .save()
-        .then(function() {
-          document.body.removeChild(clone);
-          btn.disabled = false;
-          btn.textContent = '📄 Generiraj i preuzmi PDF';
-        })
-        .catch(function(err) {
-          console.error(err);
-          if (clone.parentNode) document.body.removeChild(clone);
-          btn.disabled = false;
-          btn.textContent = '📄 Generiraj i preuzmi PDF';
-          alert('Greska pri generiranju PDF-a.');
-        });
+        /*
+         * Postavimo preview privremeno
+         * na normalnu vidljivu poziciju
+         * izvan glavnog sadržaja.
+         *
+         * NEMA opacity: 0.
+         * NEMA z-index: -1.
+         */
+
+        const oldLeft =
+          preview.style.left;
+
+        const oldTop =
+          preview.style.top;
+
+        const oldPosition =
+          preview.style.position;
+
+        const oldVisibility =
+          preview.style.visibility;
+
+
+        preview.style.position =
+          "absolute";
+
+        preview.style.left =
+          "0px";
+
+        preview.style.top =
+          "0px";
+
+        preview.style.visibility =
+          "visible";
+
+
+        /*
+         * Čekamo da browser napravi layout.
+         */
+
+        await new Promise(
+          resolve =>
+            requestAnimationFrame(
+              () =>
+                requestAnimationFrame(
+                  resolve
+                )
+            )
+        );
+
+
+        /*
+         * Čekamo i pozadinsku sliku.
+         */
+
+        const bg =
+          preview.querySelector(
+            ".bg-img"
+          );
+
+
+        if (
+          bg &&
+          !bg.complete
+        ) {
+
+          await new Promise(
+            resolve => {
+
+              bg.onload =
+                resolve;
+
+              bg.onerror =
+                resolve;
+
+              setTimeout(
+                resolve,
+                3000
+              );
+            }
+          );
+        }
+
+
+        /*
+         * Dodatno čekanje za fontove.
+         */
+
+        if (
+          document.fonts &&
+          document.fonts.ready
+        ) {
+
+          await document.fonts.ready;
+        }
+
+
+        /*
+         * Renderiranje cijelog previewa.
+         */
+
+        const canvas =
+          await html2canvas(
+            preview,
+            {
+
+              scale: 2,
+
+              useCORS: true,
+
+              allowTaint: true,
+
+              backgroundColor:
+                "#111111",
+
+              logging: false,
+
+              width: 794,
+
+              height: 1122,
+
+              windowWidth: 794,
+
+              windowHeight: 1122,
+
+              scrollX: 0,
+
+              scrollY: 0
+            }
+          );
+
+
+        /*
+         * Vraćamo preview u prvobitno stanje.
+         */
+
+        preview.style.left =
+          oldLeft;
+
+        preview.style.top =
+          oldTop;
+
+        preview.style.position =
+          oldPosition;
+
+        preview.style.visibility =
+          oldVisibility;
+
+
+        /*
+         * Provjera da canvas nije prazan.
+         */
+
+        if (
+          !canvas ||
+          canvas.width === 0 ||
+          canvas.height === 0
+        ) {
+
+          throw new Error(
+            "Canvas je prazan."
+          );
+        }
+
+
+        /*
+         * Pretvaramo canvas u JPEG.
+         */
+
+        const imgData =
+          canvas.toDataURL(
+            "image/jpeg",
+            0.98
+          );
+
+
+        /*
+         * Kreiramo A4 PDF.
+         */
+
+        const {
+          jsPDF
+        } = window.jspdf;
+
+
+        const pdf =
+          new jsPDF({
+            orientation:
+              "portrait",
+
+            unit:
+              "mm",
+
+            format:
+              "a4",
+
+            compress:
+              true
+          });
+
+
+        const pageWidth =
+          pdf.internal.pageSize
+            .getWidth();
+
+        const pageHeight =
+          pdf.internal.pageSize
+            .getHeight();
+
+
+        /*
+         * Malo unutarnje margine.
+         */
+
+        const margin = 5;
+
+        const pdfWidth =
+          pageWidth -
+          margin * 2;
+
+        const pdfHeight =
+          pageHeight -
+          margin * 2;
+
+
+        /*
+         * Omjer canvas -> A4.
+         */
+
+        const canvasRatio =
+          canvas.width /
+          canvas.height;
+
+        const pdfRatio =
+          pdfWidth /
+          pdfHeight;
+
+
+        let drawWidth;
+        let drawHeight;
+        let x;
+        let y;
+
+
+        if (
+          canvasRatio >
+          pdfRatio
+        ) {
+
+          drawWidth =
+            pdfWidth;
+
+          drawHeight =
+            pdfWidth /
+            canvasRatio;
+
+          x =
+            margin;
+
+          y =
+            margin +
+            (
+              pdfHeight -
+              drawHeight
+            ) / 2;
+
+        } else {
+
+          drawHeight =
+            pdfHeight;
+
+          drawWidth =
+            pdfHeight *
+            canvasRatio;
+
+          x =
+            margin +
+            (
+              pdfWidth -
+              drawWidth
+            ) / 2;
+
+          y =
+            margin;
+        }
+
+
+        pdf.addImage(
+          imgData,
+          "JPEG",
+          x,
+          y,
+          drawWidth,
+          drawHeight
+        );
+
+
+        /*
+         * Ime PDF-a.
+         */
+
+        const title =
+          document.getElementById(
+            "title"
+          ).value ||
+          "Trening";
+
+
+        let filename =
+          title
+            .replace(
+              /[^a-zA-Z0-9cćžšđČĆŽŠĐ ]/g,
+              ""
+            )
+            .trim();
+
+
+        if (!filename) {
+          filename = "Trening";
+        }
+
+
+        pdf.save(
+          filename + ".pdf"
+        );
+
+
+        showToast(
+          "PDF uspjesno spremljen!"
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "PDF ERROR:",
+          error
+        );
+
+
+        /*
+         * Obavezno vratimo preview
+         * ako se dogodila greška.
+         */
+
+        preview.style.left =
+          "-10000px";
+
+        preview.style.top =
+          "0px";
+
+
+        alert(
+          "Greška pri generiranju PDF-a: " +
+          error.message
+        );
+
+
+      } finally {
+
+        btn.disabled =
+          false;
+
+        btn.textContent =
+          "Generiraj i preuzmi PDF";
+      }
     }
 
-    window.onload = function() {
-      if (window.location.hash) {
-        try {
-          var encoded = window.location.hash.substring(1);
-          var data = JSON.parse(decodeURIComponent(escape(atob(encoded))));
-          document.getElementById('clientName').value = data.client || '';
-          document.getElementById('date').value = data.date || '';
-          document.getElementById('title').value = data.title || '';
-          document.getElementById('uvod').value = data.uvod || '';
-          document.getElementById('kraj').value = data.kraj || '';
-          document.getElementById('exercisesContainer').innerHTML = '';
-          exerciseCount = 0;
-          if (data.exercises && data.exercises.length > 0) {
-            for (var i = 0; i < data.exercises.length; i++) {
-              addExercise(data.exercises[i].name || '', data.exercises[i].sets || '', data.exercises[i].note || '');
+
+    /*
+     * ============================
+     * UČITAVANJE PODATAKA IZ HASH-a
+     * ============================
+     */
+
+    window.onload =
+      function() {
+
+        if (
+          window.location.hash
+        ) {
+
+          try {
+
+            const encoded =
+              window.location.hash
+                .substring(1);
+
+
+            const data =
+              JSON.parse(
+                decodeURIComponent(
+                  escape(
+                    atob(encoded)
+                  )
+                )
+              );
+
+
+            document.getElementById(
+              "clientName"
+            ).value =
+              data.client || "";
+
+
+            document.getElementById(
+              "date"
+            ).value =
+              data.date || "";
+
+
+            document.getElementById(
+              "title"
+            ).value =
+              data.title ||
+              "";
+
+
+            document.getElementById(
+              "uvod"
+            ).value =
+              data.uvod ||
+              "";
+
+
+            document.getElementById(
+              "kraj"
+            ).value =
+              data.kraj ||
+              "";
+
+
+            document.getElementById(
+              "exercisesContainer"
+            ).innerHTML =
+              "";
+
+
+            exerciseCount = 0;
+
+
+            if (
+              data.exercises &&
+              data.exercises.length
+            ) {
+
+              for (
+                let i = 0;
+                i <
+                data.exercises.length;
+                i++
+              ) {
+
+                addExercise(
+                  data.exercises[i].name ||
+                    "",
+
+                  data.exercises[i].sets ||
+                    "",
+
+                  data.exercises[i].note ||
+                    ""
+                );
+              }
+
+            } else {
+
+              addExercise();
             }
-          } else {
-            addExercise();
+
+
+          } catch (e) {
+
+            console.error(
+              "Greška pri učitavanju:",
+              e
+            );
           }
-        } catch(e) {}
-      }
-    };
+        }
+      };
+
   </script>
+
 </body>
 </html>
+
